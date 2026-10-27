@@ -13,8 +13,14 @@ export default function Login({ onLogin }) {
       const res = await api.post("/auth/login", { username, password });
       localStorage.setItem("token", res.data.access_token);
       onLogin();
-    } catch {
-      setError("Wrong username or password");
+    } catch (err) {
+      if (err.response && err.response.status === 401) {
+        setError("Wrong username or password");
+      } else if (err.response) {
+        setError(`Server error (${err.response.status}). Check the backend terminal.`);
+      } else {
+        setError("Cannot reach the server. Check that the backend is running on port 8000.");
+      }
     }
   }
 
